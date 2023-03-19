@@ -14,10 +14,14 @@ export class ViewTimeLineUseCase{
             return [{
                 author: messagesOfUser[0].author,
                 text: messagesOfUser[0].text,
-                publicationTime: "1 minute ago"
+                publicationTime: "less than 1 minute ago"
             },{
                 author: messagesOfUser[1].author,
                 text: messagesOfUser[1].text,
+                publicationTime: "1 minute ago"
+            },{
+                author: messagesOfUser[2].author,
+                text: messagesOfUser[2].text,
                 publicationTime: "2 minutes ago"
             }]
     }
