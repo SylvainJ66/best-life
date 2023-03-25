@@ -1,16 +1,13 @@
 import {
-    DateProvider, EmptyMessageError, MessageTooLongError,
-    PostMessageCommand,
-    PostMessageUseCase
+    EmptyMessageError, MessageTooLongError,
 } from "../post-message.usecase";
-import {InMemoryMessageRepository} from "./message.inmemory.repository";
-import {Message} from "../message";
-import {StubDateProvider} from "./stub-date-provider";
+import {createMessagingFixture, MessagingFixture} from "./messaging.fixtures";
+import {messageBuilder} from "./message.builder";
 
 describe("Feature: Posting a message", () => {
-    let fixture: Fixture;
+    let fixture: MessagingFixture;
     beforeEach(() => {
-       fixture = createFixture()
+       fixture = createMessagingFixture()
     });
     describe("Rule: A message can contain a maximum of 280 caracters", () => {
         test("Alice can post a message on her timeline", async () => {
@@ -20,12 +17,13 @@ describe("Feature: Posting a message", () => {
                 text: "hello world",
                 author: "Alice"
             })
-            fixture.thenPostedMessageShouldBe({
-                id: "message-id",
-                text: "hello world",
-                author: "Alice",
-                publishedAt: new Date("2023-01-19T19:00:00.000Z")
-            });
+            fixture.thenMessageShouldBe(
+                messageBuilder()
+                    .withId("message-id")
+                    .withText("hello world")
+                    .authoredBy("Alice")
+                    .withPublishedAt(new Date("2023-01-19T19:00:00.000Z"))
+                    .build());
         });
         test("Alice can not post a message with more than 280 characters", async () => {
             const textWithLenghtOf281 = "One morning, when Gregor Samsa woke from troubled dreams, " +
@@ -64,30 +62,4 @@ describe("Feature: Posting a message", () => {
             fixture.thenErrorShouldBe(EmptyMessageError);
         });
     });
-})
-const createFixture = () => {
-    const dateProvider = new StubDateProvider();
-    const messageRepository = new InMemoryMessageRepository();
-    const postMessageUseCase = new PostMessageUseCase(messageRepository, dateProvider);
-    let thrownError: Error;
-    return {
-        givenNowIs(now: Date){
-            dateProvider.now = now
-        },
-        async whenAUserPostAMessage(postMessageCommand: PostMessageCommand){
-            try {
-                await postMessageUseCase.handle(postMessageCommand);
-            }catch(err){
-                thrownError = err;
-            }
-        },
-        thenPostedMessageShouldBe(expectedMessage: Message){
-            expect(expectedMessage).toEqual(messageRepository.getMessageById(expectedMessage.id));
-        },
-        thenErrorShouldBe(expectedErrorClass: new () => Error ) {
-            expect(thrownError).toBeInstanceOf(expectedErrorClass);
-        }
-    }
-}
-
-type Fixture = ReturnType<typeof createFixture>;
+});
