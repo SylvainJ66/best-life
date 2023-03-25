@@ -1,6 +1,7 @@
 import {InMemoryMessageRepository} from "./message.inmemory.repository";
 import {ViewTimeLineUseCase} from "../view-timeline.usecase";
 import {Message} from "../message";
+import {StubDateProvider} from "./stub-date-provider";
 
 describe("Feature: Viewing a personal timeline", () => {
     let fixture: Fixture;
@@ -13,7 +14,7 @@ describe("Feature: Viewing a personal timeline", () => {
                 author: "Alice",
                 text: "my first message",
                 id: "message-1",
-                publishedAt: new Date("2023-02-07T16:28:00.000Z")
+                publishedAt: new Date("2023-02-07T16:27:59.000Z")
             },{
                 author: "Bob",
                 text: "Hi it's Bob",
@@ -28,9 +29,9 @@ describe("Feature: Viewing a personal timeline", () => {
                 author: "Alice",
                 text: "My last message",
                 id: "message-4",
-                publishedAt: new Date("2023-02-07T16:50:00.000Z")
+                publishedAt: new Date("2023-02-07T16:30:30.000Z")
             }])
-            fixture.giveNowIs(new Date("2023-02-07T16:30:00.000Z"))
+            fixture.giveNowIs(new Date("2023-02-07T16:31:00.000Z"))
             await fixture.whenTheUserSeeTheTimeLineOf("Alice")
             fixture.thenUserShouldSee([{
                 author: "Alice",
@@ -43,69 +44,25 @@ describe("Feature: Viewing a personal timeline", () => {
             },{
                 author: "Alice",
                 text: "my first message",
-                publicationTime: "2 minutes ago"
+                publicationTime: "3 minutes ago"
             }])
         });
-    });
-    const publicationTime = (now: Date, publishedAt: Date) => {
-        const diff = now.getTime() - publishedAt.getTime();
-        const minute = diff / 60000;
-        if(diff >= 120000){
-            return `${minute} minutes ago`
-        }
-        if(diff >= 60000){
-            return "1 minute ago"
-        }
-        return "less than 1 minute ago"
-    }
-    describe('PublicationTime',  () => {
-        it("should return 'less than 1 minute ago' when the publication time is" +
-            "inferior to one minute ago", () => {
-            const now = new Date('2023-02-07T10:57:00.000Z')
-            const publishedAt = new Date('2023-02-07T10:56:30.000Z')
-            const text = publicationTime(now, publishedAt);
-            expect(text).toEqual("less than 1 minute ago");
-        })
-        it("should return '1 minute ago' when the publication date exactly" +
-            "1 minute ago", () => {
-            const now = new Date('2023-02-07T10:57:00.000Z')
-            const publishedAt = new Date('2023-02-07T10:56:00.000Z')
-            const text = publicationTime(now, publishedAt);
-            expect(text).toEqual("1 minute ago");
-        })
-        it("should return '1 minute ago' when the publication date exactly" +
-            "2 minutes ago", () => {
-            const now = new Date('2023-02-07T10:57:00.000Z')
-            const publishedAt = new Date('2023-02-07T10:55:01.000Z')
-            const text = publicationTime(now, publishedAt);
-            expect(text).toEqual("1 minute ago");
-        })
-        it("should return 'X minute ago' when the publication date exactly" +
-            " 2 minutes ago", () => {
-            const now = new Date('2023-02-07T10:57:00.000Z')
-            const publishedAt = new Date('2023-02-07T10:55:00.000Z')
-            const text = publicationTime(now, publishedAt);
-            expect(text).toEqual("2 minutes ago");
-        })
-        it("should return '5 minute ago' when the publication date exactly" +
-            " 5 minutes ago", () => {
-            const now = new Date('2023-02-07T10:57:00.000Z')
-            const publishedAt = new Date('2023-02-07T10:52:00.000Z')
-            const text = publicationTime(now, publishedAt);
-            expect(text).toEqual("5 minutes ago");
-        })
     });
 });
 
 const createFixture = () => {
     let timeline: {author: string; text: string; publicationTime: string}[];
     const messageRepository = new InMemoryMessageRepository();
-    const viewTimeLineUseCase = new ViewTimeLineUseCase(messageRepository);
+    const dateProvider = new StubDateProvider();
+    const viewTimeLineUseCase = new ViewTimeLineUseCase(
+        messageRepository, dateProvider);
     return {
         givenTheFollowingMessagesExist(messages: Message[]){
             messageRepository.givenExistingMessages(messages);
         },
-        giveNowIs(now: Date){},
+        giveNowIs(now: Date){
+            dateProvider.now = now;
+        },
         async whenTheUserSeeTheTimeLineOf(user: string){
             timeline = await viewTimeLineUseCase.handle({ user });
         },
