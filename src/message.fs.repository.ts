@@ -7,7 +7,12 @@ export class FileSystemMessageRepository implements MessageRepository{
     private readonly messagePath = path.join(__dirname, 'message.json')
     async save(message: Message): Promise<void> {
         const messages = await this.getMessages();
-        messages.push(message);
+        const existingMessageIndex = messages.findIndex((msg) => msg.id === message.id);
+        if(existingMessageIndex === -1){
+            messages.push(message);
+        }else{
+            messages[existingMessageIndex] = message;
+        }
         return fs.promises.writeFile(
             this.messagePath,
             JSON.stringify(messages));
@@ -15,6 +20,10 @@ export class FileSystemMessageRepository implements MessageRepository{
     async getAllOfUser(user: string): Promise<Message[]> {
         const messages = await this.getMessages();
         return messages.filter(m => m.author === user);
+    }
+        async getById(messageId: string): Promise<Message> {
+        const allMessages = await this.getMessages();
+        return allMessages.filter(msg => msg.id === messageId)[0];
     }
     private async getMessages(): Promise<Message[]>{
         const data = await fs.promises.readFile(this.messagePath);
@@ -31,5 +40,7 @@ export class FileSystemMessageRepository implements MessageRepository{
             publishedAt: new Date(m.publishedAt),
         }));
     }
+
+
 
 }

@@ -4,6 +4,7 @@ import {DateProvider, PostMessageCommand, PostMessageUseCase} from "./src/post-m
 import {InMemoryMessageRepository} from "./src/tests/message.inmemory.repository";
 import {FileSystemMessageRepository} from "./src/message.fs.repository";
 import {ViewTimeLineUseCase} from "./src/view-timeline.usecase";
+import {EditMessageCommand, EditMessageUsecase} from "./src/edit-message.usecase";
 
 class RealDateProvider implements DateProvider{
     getNow(): Date {
@@ -13,8 +14,9 @@ class RealDateProvider implements DateProvider{
 }
 const messageRepository = new FileSystemMessageRepository()
 const dateProvider = new RealDateProvider()
-const postMessageUseCase = new PostMessageUseCase(messageRepository, dateProvider)
-const viewTimeLineUseCase = new ViewTimeLineUseCase(messageRepository, dateProvider)
+const postMessageUseCase = new PostMessageUseCase(messageRepository, dateProvider);
+const viewTimeLineUseCase = new ViewTimeLineUseCase(messageRepository, dateProvider);
+const editMessageUseCase = new EditMessageUsecase(messageRepository);
 
 const program = new Command();
 program
@@ -49,6 +51,23 @@ program
                 }catch(error){
                     console.error(error)
                     process.exit(1)
+                }
+            })
+    )
+    .addCommand(
+        new Command("edit")
+            .argument("<message-id>", "the message id of the message to edit")
+            .argument("<message>", "the new text")
+            .action(async (messageId, message) => {
+                const editMessageCommand: EditMessageCommand = {
+                    messageId,
+                    text: message
+                }
+                try {
+                    await editMessageUseCase.handle(editMessageCommand)
+                    console.log("👌 Message edité")
+                }catch (err){
+                    console.error("🤌,", err)
                 }
             })
     )
