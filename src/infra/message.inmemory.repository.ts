@@ -1,5 +1,5 @@
-import {MessageRepository} from "../message.repository";
-import {Message} from "../message";
+import {MessageRepository} from "../application/message.repository";
+import {Message} from "../domain/message";
 
 
 export class InMemoryMessageRepository implements MessageRepository{
@@ -16,7 +16,8 @@ export class InMemoryMessageRepository implements MessageRepository{
     }
     getAllOfUser(user: string): Promise<Message[]> {
         return Promise.resolve(
-            [...this.messages.values()].filter(msg => msg.author === user).map(m => ({
+            [...this.messages.values()].filter(msg => msg.author === user).map(m =>
+                Message.fromData({
                     id: m.id,
                     author: m.author,
                     text: m.text,

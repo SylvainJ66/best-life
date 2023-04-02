@@ -1,17 +1,11 @@
 #!/usr/bin/env node
-import { Command } from "commander"
-import {DateProvider, PostMessageCommand, PostMessageUseCase} from "./src/post-message.usecase";
-import {InMemoryMessageRepository} from "./src/tests/message.inmemory.repository";
-import {FileSystemMessageRepository} from "./src/message.fs.repository";
-import {ViewTimeLineUseCase} from "./src/view-timeline.usecase";
-import {EditMessageCommand, EditMessageUsecase} from "./src/edit-message.usecase";
+import {Command} from "commander"
+import {PostMessageCommand, PostMessageUseCase} from "./src/application/usecases/post-message.usecase";
+import {FileSystemMessageRepository} from "./src/infra/message.fs.repository";
+import {ViewTimeLineUseCase} from "./src/application/usecases/view-timeline.usecase";
+import {EditMessageCommand, EditMessageUsecase} from "./src/application/usecases/edit-message.usecase";
+import {RealDateProvider} from "./src/infra/realDateProvider";
 
-class RealDateProvider implements DateProvider{
-    getNow(): Date {
-        return new Date()
-    }
-
-}
 const messageRepository = new FileSystemMessageRepository()
 const dateProvider = new RealDateProvider()
 const postMessageUseCase = new PostMessageUseCase(messageRepository, dateProvider);

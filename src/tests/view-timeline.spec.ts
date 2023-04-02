@@ -16,7 +16,7 @@ describe("Feature: Viewing a personal timeline", () => {
                     .withPublishedAt(new Date("2023-02-07T16:27:59.000Z"))
                     .build(),
                 messageBuilder()
-                    .authoredBy("Alice")
+                    .authoredBy("Bobs")
                     .withId("message-2")
                     .withText("Hi it's Bob")
                     .withPublishedAt(new Date("2023-02-07T16:29:00.000Z"))

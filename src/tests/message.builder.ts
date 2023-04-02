@@ -1,4 +1,4 @@
-import {Message} from "../message";
+import {Message} from "../domain/message";
 
 export const messageBuilder = ({
    id = "message-id",
@@ -38,12 +38,12 @@ export const messageBuilder = ({
             })
         },
         build(): Message{
-            return {
+            return Message.fromData({
                 id: props.id,
                 author: props.author,
                 text: props.text,
                 publishedAt: props.publishedAt
-            }
+            });
         }
     }
 };
