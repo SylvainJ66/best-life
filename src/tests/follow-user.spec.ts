@@ -1,43 +1,49 @@
-import {InMemoryFolloweesRepository} from "../infra/followeees.inmemory.repository";
-import {PostFollowUserUseCase} from "../application/usecases/post-followuser.usecase";
-describe("Feature: Following a user", () => {
+import {InMemoryFolloweeRepository} from "../infra/followee.inmemory.repository";
+import {FollowUserCommand, FollowUserUseCase} from "../application/usecases/follow-user-use.case";
+
+describe("Feature: Following a user", () =>{
     let fixture: Fixture;
     beforeEach(() => {
-
-
-        fixture = createFixture();
-    });
+        fixture = createFixture()
+    })
     test("Alice can follow Bob", async () => {
         fixture.givenUserFollowees({
             user: "Alice",
-            followees: ["Charlie"],
+            followees: ["Charlie"]
         });
         await fixture.whenUserFollows({
-            user: "Bob",
+            user: "Alice",
             userToFollow: "Bob"
         });
         await fixture.thenUserFolloweesAre({
             user: "Alice",
             followees: ["Charlie", "Bob"]
         });
-    });
-});
+    })
+})
 
 const createFixture = () => {
-    const followeesRepository = new InMemoryFolloweesRepository();
-    const postFollowUserUseCase = new PostFollowUserUseCase(followeesRepository);
-    return {
-        givenUserFollowees({user, followees}: { user: string; followees: string[] }){
-            followeesRepository.givenExistingFollowees(user, followees);
+    const followeeRepository = new InMemoryFolloweeRepository();
+    const followUserUseCase = new FollowUserUseCase(followeeRepository);
+    return{
+        givenUserFollowees({
+            user,
+            followees }: {
+            user: string;
+            followees: string[];
+        }) {
+            followeeRepository.givenExistingFollowees(followees.map((f) => ({
+                user,
+                followee: f,
+            })));
         },
-        async whenUserFollows(userFollowsCommand: { user: string; userToFollow: string }){
-            await postFollowUserUseCase.handle(userFollowsCommand);
+        async whenUserFollows(followUserCommand: FollowUserCommand) {
+            await followUserUseCase.handle(followUserCommand);
         },
-        async thenUserFolloweesAre(expectedUserFollowees: { user: string; followees: string[] }){
-            const userFollowees = await followeesRepository.getByUser(expectedUserFollowees.user);
-            expect(userFollowees).toEqual(expectedUserFollowees);
+        async thenUserFolloweesAre(userFollowees: { user: string, followees: string[] }){
+            const actualFollowees = followeeRepository.getFolloweesOf(userFollowees.user)
+            expect(actualFollowees).toEqual(userFollowees.followees);
         },
     }
-}
-
-type Fixture = ReturnType<typeof createFixture>
+};
+type Fixture = ReturnType<typeof createFixture>;
