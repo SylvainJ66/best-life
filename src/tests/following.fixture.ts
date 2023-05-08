@@ -20,9 +20,10 @@ export const createFollowingFixture = () => {
             await followUserUseCase.handle(followUserCommand);
         },
         async thenUserFolloweesAre(userFollowees: { user: string, followees: string[] }){
-            const actualFollowees = followeeRepository.getFolloweesOf(userFollowees.user)
+            const actualFollowees = await followeeRepository.getFolloweesOf(userFollowees.user)
             expect(actualFollowees).toEqual(userFollowees.followees);
         },
+        followeeRepository,
     }
 };
 

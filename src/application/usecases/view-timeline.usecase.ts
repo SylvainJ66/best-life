@@ -1,7 +1,6 @@
 import {MessageRepository} from "../message.repository";
 import {DateProvider} from "../date.provider";
-
-const ONE_MINUTE_IN_MS = 60000;
+import {Timeline} from "../../domain/timeline";
 
 export class ViewTimeLineUseCase{
 
@@ -13,24 +12,7 @@ export class ViewTimeLineUseCase{
         text: string;
         publicationTime: string }[]>{
             const messagesOfUser = await this.messageRepository.getAllOfUser(user);
-            messagesOfUser.sort((msgA, msgB) =>
-                msgB.publishedAt.getTime() - msgA.publishedAt.getTime());
-            return messagesOfUser.map(msg => ({
-                author: msg.author,
-                text: msg.text,
-                publicationTime: this.publicationTime(msg.publishedAt)
-            }));
-    }
-    private publicationTime(publishedAt: Date){
-        const now = this.dateProvider.getNow();
-        const diff = now.getTime() - publishedAt.getTime();
-        const minute = Math.floor(diff / ONE_MINUTE_IN_MS);
-        if(minute < 1){
-            return "less than 1 minute ago"
-        }
-        if(minute < 2){
-            return "1 minute ago"
-        }
-        return `${minute} minutes ago`
+            const timeline = new Timeline(messagesOfUser, this.dateProvider.getNow());
+            return timeline.data;
     }
 }

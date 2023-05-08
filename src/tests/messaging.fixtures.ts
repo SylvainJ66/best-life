@@ -47,7 +47,8 @@ export const createMessagingFixture = () => {
         },
         thenUserShouldSee(expectedTimeline: {author: string; text: string; publicationTime: string}[]){
             expect(timeline).toEqual(expectedTimeline);
-        }
+        },
+        messageRepository,
     }
 }
 
