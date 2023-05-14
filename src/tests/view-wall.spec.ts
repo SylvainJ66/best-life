@@ -28,20 +28,20 @@ describe("Feature: Viewing user wall", () => {
                     .authoredBy("Alice")
                     .withId("m1")
                     .withText("I love the weather today")
-                    .withPublishedAt(new Date("2023-02-09T15:00:30.000Z"))
+                    .publishedAt(new Date("2023-02-09T15:00:30.000Z"))
                     .build(),
                 messageBuilder()
                     .authoredBy("Bob")
                     .withId("m2")
                     .withText("Damn! We lost!")
-                    .withPublishedAt(new Date("2023-02-09T15:01:00.000Z"))
+                    .publishedAt(new Date("2023-02-09T15:01:00.000Z"))
                     .build(),
                 messageBuilder()
                     .authoredBy("Charlie")
                     .withId("m3")
                     .withText("I'm in New York today! Anyone wants to have " +
                         "a coffee?")
-                    .withPublishedAt(new Date("2023-02-09T15:15:00.000Z"))
+                    .publishedAt(new Date("2023-02-09T15:15:00.000Z"))
                     .build(),
             ]);
             followingFixture.givenUserFollowees({

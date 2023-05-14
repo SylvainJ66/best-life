@@ -14,7 +14,7 @@ describe("FileSystemRepository", () => {
             messageBuilder()
                 .authoredBy("Alice")
                 .withId("m1")
-                .withPublishedAt(new Date("2023-02-16T14:54:00.000Z"))
+                .publishedAt(new Date("2023-02-16T14:54:00.000Z"))
                 .withText("test message")
                 .build()
         );
@@ -39,7 +39,7 @@ describe("FileSystemRepository", () => {
             messageBuilder()
                 .authoredBy("Alice")
                 .withId("m1")
-                .withPublishedAt(new Date("2023-02-16T14:54:00.000Z"))
+                .publishedAt(new Date("2023-02-16T14:54:00.000Z"))
                 .withText("test message edited")
                 .build()
         );
@@ -71,7 +71,7 @@ describe("FileSystemRepository", () => {
                 .authoredBy("Bob")
                 .withId("m2")
                 .withText("Hello from Bob")
-                .withPublishedAt(new Date("2023-02-16T14:55:00.000Z"))
+                .publishedAt(new Date("2023-02-16T14:55:00.000Z"))
                 .build())
     });
     test("getAllOfUser return all messages from a specific user", async () => {
@@ -99,13 +99,13 @@ describe("FileSystemRepository", () => {
                 .authoredBy("Alice")
                 .withId("m1")
                 .withText("test message")
-                .withPublishedAt(new Date("2023-02-16T14:54:00.000Z"))
+                .publishedAt(new Date("2023-02-16T14:54:00.000Z"))
                 .build(),
             messageBuilder()
                 .authoredBy("Alice")
                 .withId("m3")
                 .withText("Alice message 2")
-                .withPublishedAt(new Date("2023-02-16T14:56:00.000Z"))
+                .publishedAt(new Date("2023-02-16T14:56:00.000Z"))
                 .build()]))
     });
 })

@@ -1,8 +1,6 @@
 import {MessageRepository} from "../application/message.repository";
 import {Message} from "../domain/message";
 import {PrismaClient} from "prisma/prisma-client/scripts/default-index";
-import {messageBuilder} from "../tests/message.builder";
-
 export class PrismaMessageRepository implements MessageRepository{
     constructor(private readonly prisma: PrismaClient) {
     }
@@ -37,7 +35,7 @@ export class PrismaMessageRepository implements MessageRepository{
             update: { name: messageData.author },
             create: { name: messageData.author },
         })
-        await this.prisma.upsert({
+        await this.prisma.message.upsert({
             where: { id: messageData.id },
             update: {
                 id: messageData.id,

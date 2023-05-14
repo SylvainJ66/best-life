@@ -20,7 +20,7 @@ describe("Feature: Posting a message", () => {
                     .withId("message-id")
                     .withText("hello world")
                     .authoredBy("Alice")
-                    .withPublishedAt(new Date("2023-01-19T19:00:00.000Z"))
+                    .publishedAt(new Date("2023-01-19T19:00:00.000Z"))
                     .build());
         });
         test("Alice can not post a message with more than 280 characters", async () => {

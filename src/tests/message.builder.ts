@@ -31,7 +31,7 @@ export const messageBuilder = ({
                  text: _text
              })
         },
-        withPublishedAt(_publishedAt: Date){
+        publishedAt(_publishedAt: Date){
             return messageBuilder({
                 ...props,
                 publishedAt: _publishedAt
