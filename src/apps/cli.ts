@@ -1,17 +1,19 @@
 #!/usr/bin/env node
 import {Command} from "commander"
-import {PostMessageCommand, PostMessageUseCase} from "./src/application/usecases/post-message.usecase";
-import {FileSystemMessageRepository} from "./src/infra/message.fs.repository";
-import {ViewTimeLineUseCase} from "./src/application/usecases/view-timeline.usecase";
-import {EditMessageCommand, EditMessageUsecase} from "./src/application/usecases/edit-message.usecase";
-import {RealDateProvider} from "./src/infra/realDateProvider";
-import {FollowUserCommand, FollowUserUseCase} from "./src/application/usecases/follow-user-use.case";
-import {FileSystemFolloweeFsRepository} from "./src/infra/followee.fs.repository";
-import {ViewWallUseCase} from "./src/application/usecases/view-wall.usecase";
+import {PostMessageCommand, PostMessageUseCase} from "../application/usecases/post-message.usecase";
+import {ViewTimeLineUseCase} from "../application/usecases/view-timeline.usecase";
+import {EditMessageCommand, EditMessageUsecase} from "../application/usecases/edit-message.usecase";
+import {RealDateProvider} from "../infra/realDateProvider";
+import {FollowUserCommand, FollowUserUseCase} from "../application/usecases/follow-user-use.case";
+import {ViewWallUseCase} from "../application/usecases/view-wall.usecase";
+import {PrismaMessageRepository} from "../infra/message.prisma.repository";
+import {PrismaFolloweeRepository} from "../infra/followee.prisma.repository";
+import {PrismaClient} from "@prisma/client";
 
-const messageRepository = new FileSystemMessageRepository();
-const followeeRepository = new FileSystemFolloweeFsRepository();
-const dateProvider = new RealDateProvider()
+const prismaClient = new PrismaClient();
+const messageRepository = new PrismaMessageRepository(prismaClient);
+const followeeRepository = new PrismaFolloweeRepository(prismaClient);
+const dateProvider = new RealDateProvider();
 const postMessageUseCase = new PostMessageUseCase(messageRepository, dateProvider);
 const viewTimeLineUseCase = new ViewTimeLineUseCase(messageRepository, dateProvider);
 const viewWallUseCase = new ViewWallUseCase(messageRepository, followeeRepository, dateProvider);
@@ -104,6 +106,8 @@ program
     )
 
 async function main(){
+    await prismaClient.$connect();
     await program.parseAsync()
+    await prismaClient.$disconnect();
 }
 main();
