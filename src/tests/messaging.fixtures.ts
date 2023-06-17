@@ -4,6 +4,8 @@ import {PostMessageCommand, PostMessageUseCase} from "../application/usecases/po
 import {Message} from "../domain/message";
 import {ViewTimeLineUseCase} from "../application/usecases/view-timeline.usecase";
 import {EditMessageCommand, EditMessageUsecase} from "../application/usecases/edit-message.usecase";
+import {DefaultTimelinePresenter} from "../apps/defaultTimelinePresenter";
+import {TimelinePresenter} from "../apps/timeline.presenter";
 
 export const createMessagingFixture = () => {
     const dateProvider = new StubDateProvider();
@@ -11,6 +13,12 @@ export const createMessagingFixture = () => {
     const postMessageUseCase = new PostMessageUseCase(messageRepository, dateProvider);
     const viewTimeLineUseCase = new ViewTimeLineUseCase(
         messageRepository, dateProvider);
+    const defaultTimelinePresenter = new DefaultTimelinePresenter(dateProvider);
+    const timelinePresenter: TimelinePresenter = {
+        show(theTimeLine ){
+            timeline = defaultTimelinePresenter.show(theTimeLine)
+        }
+    };
     const editMessageUseCase = new EditMessageUsecase(messageRepository);
     let timeline: {author: string; text: string; publicationTime: string}[];
     let thrownError: Error;
@@ -22,7 +30,7 @@ export const createMessagingFixture = () => {
             dateProvider.now = now
         },
         async whenTheUserSeeTheTimeLineOf(user: string){
-            timeline = await viewTimeLineUseCase.handle({ user });
+            await viewTimeLineUseCase.handle({ user }, timelinePresenter);
         },
         async whenAUserPostAMessage(postMessageCommand: PostMessageCommand){
             try {

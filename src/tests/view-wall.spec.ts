@@ -5,6 +5,8 @@ import {StubDateProvider} from "../infra/stub-date-provider";
 import {ViewWallUseCase} from "../application/usecases/view-wall.usecase";
 import {MessageRepository} from "../application/message.repository";
 import {FolloweeRepository} from "../application/followee.repository";
+import {DefaultTimelinePresenter} from "../apps/defaultTimelinePresenter";
+import {TimelinePresenter} from "../apps/timeline.presenter";
 
 describe("Feature: Viewing user wall", () => {
     let fixture: Fixture;
@@ -69,16 +71,21 @@ const createFixture = ({ messageRepository, followeeRepository }: {
     followeeRepository: FolloweeRepository}) => {
     let wall: { author: string; text: string; publicationTime: string }[];
     const dateProvider = new StubDateProvider();
+    const defaultWallPresenter = new DefaultTimelinePresenter(dateProvider);
+    const wallPresenter: TimelinePresenter = {
+        show(theTimeLine ){
+            wall = defaultWallPresenter.show(theTimeLine)
+        }
+    };
     const viewWallUseCase = new ViewWallUseCase(
         messageRepository,
-        followeeRepository,
-        dateProvider);
+        followeeRepository);
     return {
         givenNowIs(now: Date){
             dateProvider.now = now;
         },
         async whenUserSeesTheWallOf(user: string){
-            wall = await viewWallUseCase.handle({ user });
+            await viewWallUseCase.handle({ user }, wallPresenter);
         },
         thenUserShouldSee(expectedWall: {
             author: string;
